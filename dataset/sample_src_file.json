@@ -1,0 +1,164 @@
+{
+	"name": "sample_src_file",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AZBlob_StorageStg_Generic",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"Folder": {
+					"value": "@dataset().linkedlist_Folder",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"Container": {
+				"type": "string",
+				"defaultValue": "jsonfiles"
+			},
+			"File": {
+				"type": "string",
+				"defaultValue": "srcfile.json"
+			},
+			"linkedlist_Folder": {
+				"type": "string",
+				"defaultValue": "jsonfiles"
+			}
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().File",
+					"type": "Expression"
+				},
+				"container": {
+					"value": "@dataset().Container",
+					"type": "Expression"
+				}
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"feeds": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"id": {
+								"type": "integer"
+							},
+							"title": {
+								"type": "string"
+							},
+							"description": {
+								"type": "string"
+							},
+							"location": {
+								"type": "string"
+							},
+							"lng": {
+								"type": "integer"
+							},
+							"lat": {
+								"type": "integer"
+							},
+							"userId": {
+								"type": "integer"
+							},
+							"name": {
+								"type": "string"
+							},
+							"isdeleted": {
+								"type": "boolean"
+							},
+							"profilePicture": {
+								"type": "string"
+							},
+							"videoUrl": {
+								"type": "null"
+							},
+							"images": {
+								"type": "null"
+							},
+							"mediatype": {
+								"type": "integer"
+							},
+							"imagePaths": {
+								"type": "null"
+							},
+							"feedsComment": {
+								"type": "null"
+							},
+							"commentCount": {
+								"type": "integer"
+							},
+							"multiMedia": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"id": {
+											"type": "integer"
+										},
+										"name": {
+											"type": "string"
+										},
+										"description": {
+											"type": "null"
+										},
+										"url": {
+											"type": "string"
+										},
+										"mediatype": {
+											"type": "integer"
+										},
+										"likeCount": {
+											"type": "integer"
+										},
+										"place": {
+											"type": "null"
+										},
+										"createAt": {
+											"type": "string"
+										}
+									}
+								}
+							},
+							"likeDislike": {
+								"type": "object",
+								"properties": {
+									"likes": {
+										"type": "integer"
+									},
+									"dislikes": {
+										"type": "integer"
+									},
+									"userAction": {
+										"type": "integer"
+									}
+								}
+							},
+							"createdAt": {
+								"type": "string"
+							},
+							"code": {
+								"type": "integer"
+							},
+							"msg": {
+								"type": "null"
+							}
+						}
+					}
+				},
+				"totalFeed": {
+					"type": "integer"
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

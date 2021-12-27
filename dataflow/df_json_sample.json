@@ -1,0 +1,28 @@
+{
+	"name": "df_json_sample",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "sample_src_file",
+						"type": "DatasetReference"
+					},
+					"name": "srcfileJson"
+				}
+			],
+			"sinks": [
+				{
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "Flatten1"
+				}
+			],
+			"script": "source(output(\n\t\tfeeds as (id as integer, title as string, description as string, location as string, lng as integer, lat as integer, userId as integer, name as string, isdeleted as boolean, profilePicture as string, videoUrl as string, images as string, mediatype as integer, imagePaths as string, feedsComment as string, commentCount as integer, multiMedia as (id as integer, name as string, description as string, url as string, mediatype as integer, likeCount as integer, place as string, createAt as string)[], likeDislike as (likes as integer, dislikes as integer, userAction as integer), createdAt as string, code as integer, msg as string)[],\n\t\ttotalFeed as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tdocumentForm: 'arrayOfDocuments') ~> srcfileJson\nsrcfileJson foldDown(unroll(feeds.multiMedia),\n\tmapColumn(\n\t\tfeedsid = feeds.id,\n\t\ttitle = feeds.title,\n\t\tfeedsdescription = feeds.description,\n\t\tlocation = feeds.location,\n\t\tlng = feeds.lng,\n\t\tlat = feeds.lat,\n\t\tuserId = feeds.userId,\n\t\tfeedsname = feeds.name,\n\t\tisdeleted = feeds.isdeleted,\n\t\tprofilePicture = feeds.profilePicture,\n\t\tvideoUrl = feeds.videoUrl,\n\t\timages = feeds.images,\n\t\tfeedsmediatype = feeds.mediatype,\n\t\timagePaths = feeds.imagePaths,\n\t\tfeedsComment = feeds.feedsComment,\n\t\tcommentCount = feeds.commentCount,\n\t\tid = feeds.multiMedia.id,\n\t\tname = feeds.multiMedia.name,\n\t\tdescription = feeds.multiMedia.description,\n\t\turl = feeds.multiMedia.url,\n\t\tfeedsmultiMediamediatype = feeds.multiMedia.mediatype,\n\t\tlikeCount = feeds.multiMedia.likeCount,\n\t\tplace = feeds.multiMedia.place,\n\t\tcreateAt = feeds.multiMedia.createAt,\n\t\tlikes = feeds.likeDislike.likes,\n\t\tdislikes = feeds.likeDislike.dislikes,\n\t\tuserAction = feeds.likeDislike.userAction,\n\t\tcreatedAt = feeds.createdAt,\n\t\tcode = feeds.code,\n\t\tmsg = feeds.msg\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> Flatten1\nFlatten1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tstore: 'cache',\n\tformat: 'inline',\n\toutput: false,\n\tsaveOrder: 1) ~> sink1"
+		}
+	}
+}
