@@ -1,0 +1,264 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "ADF-pg1"
+		},
+		"ls_AZBlob_StorageStg_Generic_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ls_AZBlob_StorageStg_Generic'"
+		},
+		"ls_AZ_Datalake_Conn_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ls_AZ_Datalake_Conn'"
+		},
+		"ls_AZ_Datalake_Conn_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://storagetargetpg.dfs.core.windows.net"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/sample_src_file')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_AZBlob_StorageStg_Generic",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"Folder": {
+							"value": "@dataset().linkedlist_Folder",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"Container": {
+						"type": "string",
+						"defaultValue": "jsonfiles"
+					},
+					"File": {
+						"type": "string",
+						"defaultValue": "srcfile.json"
+					},
+					"linkedlist_Folder": {
+						"type": "string",
+						"defaultValue": "jsonfiles"
+					}
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@dataset().File",
+							"type": "Expression"
+						},
+						"container": {
+							"value": "@dataset().Container",
+							"type": "Expression"
+						}
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"feeds": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"id": {
+										"type": "integer"
+									},
+									"title": {
+										"type": "string"
+									},
+									"description": {
+										"type": "string"
+									},
+									"location": {
+										"type": "string"
+									},
+									"lng": {
+										"type": "integer"
+									},
+									"lat": {
+										"type": "integer"
+									},
+									"userId": {
+										"type": "integer"
+									},
+									"name": {
+										"type": "string"
+									},
+									"isdeleted": {
+										"type": "boolean"
+									},
+									"profilePicture": {
+										"type": "string"
+									},
+									"videoUrl": {
+										"type": "null"
+									},
+									"images": {
+										"type": "null"
+									},
+									"mediatype": {
+										"type": "integer"
+									},
+									"imagePaths": {
+										"type": "null"
+									},
+									"feedsComment": {
+										"type": "null"
+									},
+									"commentCount": {
+										"type": "integer"
+									},
+									"multiMedia": {
+										"type": "array",
+										"items": {
+											"type": "object",
+											"properties": {
+												"id": {
+													"type": "integer"
+												},
+												"name": {
+													"type": "string"
+												},
+												"description": {
+													"type": "null"
+												},
+												"url": {
+													"type": "string"
+												},
+												"mediatype": {
+													"type": "integer"
+												},
+												"likeCount": {
+													"type": "integer"
+												},
+												"place": {
+													"type": "null"
+												},
+												"createAt": {
+													"type": "string"
+												}
+											}
+										}
+									},
+									"likeDislike": {
+										"type": "object",
+										"properties": {
+											"likes": {
+												"type": "integer"
+											},
+											"dislikes": {
+												"type": "integer"
+											},
+											"userAction": {
+												"type": "integer"
+											}
+										}
+									},
+									"createdAt": {
+										"type": "string"
+									},
+									"code": {
+										"type": "integer"
+									},
+									"msg": {
+										"type": "null"
+									}
+								}
+							}
+						},
+						"totalFeed": {
+							"type": "integer"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_AZBlob_StorageStg_Generic')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_AZBlob_StorageStg_Generic')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"Folder": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('ls_AZBlob_StorageStg_Generic_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_AZ_Datalake_Conn')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('ls_AZ_Datalake_Conn_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('ls_AZ_Datalake_Conn_accountKey')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_json_sample')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "sample_src_file",
+								"type": "DatasetReference"
+							},
+							"name": "srcfileJson"
+						}
+					],
+					"sinks": [
+						{
+							"name": "Target"
+						}
+					],
+					"transformations": [
+						{
+							"name": "FlattenJson"
+						}
+					],
+					"script": "source(output(\n\t\tfeeds as (id as integer, title as string, description as string, location as string, lng as integer, lat as integer, userId as integer, name as string, isdeleted as boolean, profilePicture as string, videoUrl as string, images as string, mediatype as integer, imagePaths as string, feedsComment as string, commentCount as integer, multiMedia as (id as integer, name as string, description as string, url as string, mediatype as integer, likeCount as integer, place as string, createAt as string)[], likeDislike as (likes as integer, dislikes as integer, userAction as integer), createdAt as string, code as integer, msg as string)[],\n\t\ttotalFeed as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tdocumentForm: 'arrayOfDocuments') ~> srcfileJson\nsrcfileJson foldDown(unroll(feeds.multiMedia),\n\tmapColumn(\n\t\tfeedsid = feeds.id,\n\t\ttitle = feeds.title,\n\t\tfeedsdescription = feeds.description,\n\t\tlocation = feeds.location,\n\t\tlng = feeds.lng,\n\t\tlat = feeds.lat,\n\t\tuserId = feeds.userId,\n\t\tfeedsname = feeds.name,\n\t\tisdeleted = feeds.isdeleted,\n\t\tprofilePicture = feeds.profilePicture,\n\t\tvideoUrl = feeds.videoUrl,\n\t\timages = feeds.images,\n\t\tfeedsmediatype = feeds.mediatype,\n\t\timagePaths = feeds.imagePaths,\n\t\tfeedsComment = feeds.feedsComment,\n\t\tcommentCount = feeds.commentCount,\n\t\tid = feeds.multiMedia.id,\n\t\tname = feeds.multiMedia.name,\n\t\tdescription = feeds.multiMedia.description,\n\t\turl = feeds.multiMedia.url,\n\t\tfeedsmultiMediamediatype = feeds.multiMedia.mediatype,\n\t\tlikeCount = feeds.multiMedia.likeCount,\n\t\tplace = feeds.multiMedia.place,\n\t\tcreateAt = feeds.multiMedia.createAt,\n\t\tlikes = feeds.likeDislike.likes,\n\t\tdislikes = feeds.likeDislike.dislikes,\n\t\tuserAction = feeds.likeDislike.userAction,\n\t\tcreatedAt = feeds.createdAt,\n\t\tcode = feeds.code,\n\t\tmsg = feeds.msg\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> FlattenJson\nFlattenJson sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tstore: 'cache',\n\tformat: 'inline',\n\toutput: false,\n\tsaveOrder: 1) ~> Target"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/sample_src_file')]"
+			]
+		}
+	]
+}
